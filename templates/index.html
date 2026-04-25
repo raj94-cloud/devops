@@ -39,6 +39,16 @@
         }
         .hero h2 { font-size: 48px; text-shadow: 2px 2px 8px #000; }
         .hero p { font-size: 16px; max-width: 500px; margin-top: 10px; color: #ccc; }
+        .hero button {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: #e50914;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
 
         .section { padding: 20px 40px; }
         .section h3 { font-size: 20px; margin-bottom: 15px; color: #e5e5e5; }
@@ -57,15 +67,23 @@
             background: #1f1f1f;
         }
         .movie-card:hover { transform: scale(1.05); }
-        .movie-card img {
-            width: 100%;
-            height: 270px;
-            object-fit: cover;
-        }
+        .movie-card img { width: 100%; height: 270px; object-fit: cover; }
         .movie-info { padding: 10px; }
         .movie-info h4 { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .movie-info span { font-size: 12px; color: #aaa; }
         .rating { color: #f5c518; font-weight: bold; }
+        .play-btn {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+            padding: 6px;
+            background: #e50914;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
 
         .genre-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .genre-btn {
@@ -78,6 +96,45 @@
             font-size: 13px;
         }
         .genre-btn:hover, .genre-btn.active { background: #e50914; border-color: #e50914; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.open { display: flex; }
+        .modal-content {
+            background: #1f1f1f;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        .modal-header h3 { font-size: 20px; }
+        .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .modal iframe {
+            width: 100%;
+            height: 450px;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -91,6 +148,7 @@
     <div>
         <h2>The Dark Knight</h2>
         <p>Batman faces the Joker, a criminal mastermind who wants to plunge Gotham into anarchy.</p>
+        <button onclick="openTrailer('https://www.youtube.com/embed/EXeTwQWrcwY', 'The Dark Knight')">▶ Play Trailer</button>
     </div>
 </div>
 
@@ -106,18 +164,42 @@
     <div class="movies-grid" id="movies-grid">
         {% for movie in movies %}
         <div class="movie-card" data-genre="{{ movie.genre }}" data-title="{{ movie.title }}">
-            <img src="{{ movie.thumbnail }}" alt="{{ movie.title }}" onerror="this.src='https://via.placeholder.com/180x270?text={{ movie.title }}'">
+            <img src="{{ movie.thumbnail }}" alt="{{ movie.title }}"
+                 onerror="this.src='https://via.placeholder.com/180x270?text={{ movie.title }}'">
             <div class="movie-info">
                 <h4>{{ movie.title }}</h4>
                 <span>{{ movie.year }} • {{ movie.genre }}</span><br>
                 <span class="rating">⭐ {{ movie.rating }}</span>
+                <button class="play-btn" onclick="openTrailer('{{ movie.trailer }}', '{{ movie.title }}')">▶ Play Trailer</button>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
 
+<!-- Video Modal -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title"></h3>
+            <button class="close-btn" onclick="closeTrailer()">✕</button>
+        </div>
+        <iframe id="modal-iframe" src="" allowfullscreen allow="autoplay"></iframe>
+    </div>
+</div>
+
 <script>
+    function openTrailer(url, title) {
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-iframe').src = url + '?autoplay=1';
+        document.getElementById('modal').classList.add('open');
+    }
+
+    function closeTrailer() {
+        document.getElementById('modal-iframe').src = '';
+        document.getElementById('modal').classList.remove('open');
+    }
+
     function filterMovies() {
         const q = document.getElementById('search').value.toLowerCase();
         document.querySelectorAll('.movie-card').forEach(card => {
@@ -132,6 +214,11 @@
             card.style.display = (genre === 'All' || card.dataset.genre === genre) ? 'block' : 'none';
         });
     }
+
+    // Close modal on background click
+    document.getElementById('modal').addEventListener('click', function(e) {
+        if (e.target === this) closeTrailer();
+    });
 </script>
 
 </body>
