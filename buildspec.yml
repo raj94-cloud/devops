@@ -1,0 +1,10 @@
+version: "0.2"
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 596652342676.dkr.ecr.ap-south-1.amazonaws.com
+  build:
+    commands:
+      - docker build -t streamflix:latest .
+      - docker tag streamflix:latest 596652342676.dkr.ecr.ap-south-1.amazonaws.com/streamflix:latest
+      - docker push 596652342676.dkr.ecr.ap-south-1.amazonaws.com/streamflix:latest
