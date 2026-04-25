@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamFlix</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #141414; color: #fff; font-family: Arial, sans-serif; }
+
+        .navbar {
+            background: #000;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar h1 { color: #e50914; font-size: 28px; font-weight: bold; }
+        .navbar input {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            background: #333;
+            color: #fff;
+            width: 250px;
+            font-size: 14px;
+        }
+
+        .hero {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), #141414),
+                        url('https://image.tmdb.org/t/p/original/qJ2tW6WMUDux911r6m7haRef0WH.jpg') center/cover;
+            height: 400px;
+            display: flex;
+            align-items: flex-end;
+            padding: 40px;
+        }
+        .hero h2 { font-size: 48px; text-shadow: 2px 2px 8px #000; }
+        .hero p { font-size: 16px; max-width: 500px; margin-top: 10px; color: #ccc; }
+
+        .section { padding: 20px 40px; }
+        .section h3 { font-size: 20px; margin-bottom: 15px; color: #e5e5e5; }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .movie-card {
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background: #1f1f1f;
+        }
+        .movie-card:hover { transform: scale(1.05); }
+        .movie-card img {
+            width: 100%;
+            height: 270px;
+            object-fit: cover;
+        }
+        .movie-info { padding: 10px; }
+        .movie-info h4 { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .movie-info span { font-size: 12px; color: #aaa; }
+        .rating { color: #f5c518; font-weight: bold; }
+
+        .genre-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .genre-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #555;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .genre-btn:hover, .genre-btn.active { background: #e50914; border-color: #e50914; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>StreamFlix</h1>
+    <input type="text" id="search" placeholder="Search movies..." oninput="filterMovies()">
+</nav>
+
+<div class="hero">
+    <div>
+        <h2>The Dark Knight</h2>
+        <p>Batman faces the Joker, a criminal mastermind who wants to plunge Gotham into anarchy.</p>
+    </div>
+</div>
+
+<div class="section">
+    <div class="genre-filters">
+        <button class="genre-btn active" onclick="filterGenre('All', this)">All</button>
+        <button class="genre-btn" onclick="filterGenre('Action', this)">Action</button>
+        <button class="genre-btn" onclick="filterGenre('Sci-Fi', this)">Sci-Fi</button>
+        <button class="genre-btn" onclick="filterGenre('Drama', this)">Drama</button>
+    </div>
+
+    <h3>🎬 All Movies</h3>
+    <div class="movies-grid" id="movies-grid">
+        {% for movie in movies %}
+        <div class="movie-card" data-genre="{{ movie.genre }}" data-title="{{ movie.title }}">
+            <img src="{{ movie.thumbnail }}" alt="{{ movie.title }}" onerror="this.src='https://via.placeholder.com/180x270?text={{ movie.title }}'">
+            <div class="movie-info">
+                <h4>{{ movie.title }}</h4>
+                <span>{{ movie.year }} • {{ movie.genre }}</span><br>
+                <span class="rating">⭐ {{ movie.rating }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function filterMovies() {
+        const q = document.getElementById('search').value.toLowerCase();
+        document.querySelectorAll('.movie-card').forEach(card => {
+            card.style.display = card.dataset.title.toLowerCase().includes(q) ? 'block' : 'none';
+        });
+    }
+
+    function filterGenre(genre, btn) {
+        document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.movie-card').forEach(card => {
+            card.style.display = (genre === 'All' || card.dataset.genre === genre) ? 'block' : 'none';
+        });
+    }
+</script>
+
+</body>
+</html>
